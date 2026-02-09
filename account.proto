@@ -1,0 +1,76 @@
+// protos/account.proto
+syntax = "proto3";
+
+package account;
+
+// Account Service tanımı
+service AccountService {
+  // Account oluşturma (Saga adımı)
+  rpc CreateAccount (CreateAccountRequest) returns (AccountResponse);
+  
+  // Compensation endpoint (Rollback için)
+  rpc CompensateAccount (CompensateAccountRequest) returns (AccountResponse);
+  
+  // Account sorgulama
+  rpc GetAccount (GetAccountRequest) returns (AccountResponse);
+  
+  // Account güncelleme
+  rpc UpdateAccount (UpdateAccountRequest) returns (AccountResponse);
+  
+  // Account silme (soft delete)
+  rpc DeleteAccount (DeleteAccountRequest) returns (Empty);
+  
+  // Tüm accountları listele
+  rpc ListAccounts (ListAccountsRequest) returns (ListAccountsResponse);
+}
+
+// Messages
+message CreateAccountRequest {
+  string email = 1;
+  string name = 2;
+  string password = 3;
+  optional string phoneNumber = 4;
+  optional string postalCode = 5;
+}
+
+message CompensateAccountRequest {
+  string accountId = 1;
+}
+
+message GetAccountRequest {
+  string accountId = 1;
+}
+
+message UpdateAccountRequest {
+  string accountId = 1;
+  optional string email = 2;
+  optional string name = 3;
+  optional string password = 4;
+}
+
+message DeleteAccountRequest {
+  string accountId = 1;
+}
+
+message ListAccountsRequest {
+  int32 page = 1;
+  int32 limit = 2;
+}
+
+message AccountResponse {
+  string id = 1;
+  string email = 2;
+  string name = 3;
+  string createdAt = 4;
+  string updatedAt = 5;
+  optional string deletedAt = 6;
+}
+
+message ListAccountsResponse {
+  repeated AccountResponse accounts = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 limit = 4;
+}
+
+message Empty {}

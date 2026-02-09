@@ -1,0 +1,74 @@
+// proto/workspace.proto
+syntax = "proto3";
+
+package workspace;
+
+// Workspace Service tanımı
+service WorkspaceService {
+  // Workspace oluşturma (Saga adımı)
+  rpc CreateWorkspace (CreateWorkspaceRequest) returns (WorkspaceResponse);
+  
+  // Compensation endpoint (Rollback için - soft delete)
+  rpc CompensateWorkspace (CompensateWorkspaceRequest) returns (WorkspaceResponse);
+  
+  // Workspace sorgulama
+  rpc GetWorkspace (GetWorkspaceRequest) returns (WorkspaceResponse);
+  
+  // Account'a ait workspaceleri listele
+  rpc GetWorkspacesByOwnerId (GetWorkspacesByOwnerIdRequest) returns (ListWorkspacesResponse);
+  
+  // Account'a ait tüm workspaceleri listele (deleted dahil)
+  rpc GetAllWorkspacesByOwnerId (GetWorkspacesByOwnerIdRequest) returns (ListWorkspacesResponse);
+  
+  // Workspace restore (manual recovery için)
+  rpc RestoreWorkspace (RestoreWorkspaceRequest) returns (WorkspaceResponse);
+  
+  // Health check
+  rpc HealthCheck (Empty) returns (HealthCheckResponse);
+}
+
+// Messages
+message CreateWorkspaceRequest {
+  string name = 1;
+  string ownerId = 2; // accountId
+  optional string address = 3;
+  optional string country = 4;
+}
+
+message CompensateWorkspaceRequest {
+  string workspaceId = 1;
+}
+
+message GetWorkspaceRequest {
+  string workspaceId = 1;
+}
+
+message GetWorkspacesByOwnerIdRequest {
+  string ownerId = 1;
+}
+
+message RestoreWorkspaceRequest {
+  string workspaceId = 1;
+}
+
+message WorkspaceResponse {
+  string id = 1;
+  string name = 2;
+  string ownerId = 3;
+  bool isDeleted = 4;
+  optional string deletedAt = 5;
+  string createdAt = 6;
+  string updatedAt = 7;
+}
+
+message ListWorkspacesResponse {
+  repeated WorkspaceResponse workspaces = 1;
+  int32 total = 2;
+}
+
+message HealthCheckResponse {
+  string status = 1;
+  string service = 2;
+}
+
+message Empty {}
